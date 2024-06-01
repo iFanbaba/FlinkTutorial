@@ -29,7 +29,9 @@ public class BroadcastStateExample {
                 new Action("Alice", "login"),
                 new Action("Alice", "pay"),
                 new Action("Bob", "login"),
-                new Action("Bob", "order")
+                new Action("Bob", "order"),
+                new Action("JACK", "login"),
+                new Action("JACK", "buy")
         );
 
         // 定义行为模式流，代表了要检测的标准，给予他构建广播流
