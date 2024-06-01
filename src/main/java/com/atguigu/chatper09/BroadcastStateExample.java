@@ -63,16 +63,15 @@ public class BroadcastStateExample {
     //IN1: 主流类型
     //IN2: 广播流类型
     //OUT: 输出流的类型
-    public static class PatternEvaluator
-            extends KeyedBroadcastProcessFunction<String, Action, Pattern, Tuple2<String, Pattern>> {
+    public static class PatternEvaluator extends KeyedBroadcastProcessFunction<String, Action, Pattern, Tuple2<String, Pattern>> {
 
         // 定义一个值状态，保存上一次用户行为
         ValueState<String> prevActionState;
 
         @Override
         public void open(Configuration conf) {
-            prevActionState = getRuntimeContext().getState(
-                    new ValueStateDescriptor<>("lastAction", Types.STRING));
+            //此为初始化只状态，用于保存用户上一次的行为。
+            prevActionState = getRuntimeContext().getState(new ValueStateDescriptor<>("lastAction", Types.STRING));
         }
 
         @Override
@@ -81,6 +80,7 @@ public class BroadcastStateExample {
                 Context ctx,
                 Collector<Tuple2<String, Pattern>> out) throws Exception {
 
+            //从上下文中获取广播状态，并用当前数据更新广播状态
             BroadcastState<Void, Pattern> bcState = ctx.getBroadcastState(
                     new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
 
@@ -91,9 +91,11 @@ public class BroadcastStateExample {
         @Override
         public void processElement(Action action, ReadOnlyContext ctx,
                                    Collector<Tuple2<String, Pattern>> out) throws Exception {
+            //在 processElement 方法中只能读取状态，不能修改
             Pattern pattern = ctx.getBroadcastState(
                     new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class))).get(null);
 
+            //用户上一次的行为，并不在广播状态中，而是在我们在本类中定义的ValueState中。
             String prevAction = prevActionState.value();
             if (pattern != null && prevAction != null) {
                 // 如果前后两次行为都符合模式定义，输出一组匹配
