@@ -88,12 +88,16 @@ public class BroadcastStateExample {
         public void processElement(Action action, ReadOnlyContext ctx, Collector<Tuple2<String, Pattern>> out) throws Exception {
             //在 processElement 方法中只能读取状态，不能修改
             ReadOnlyBroadcastState<Void, Pattern> patterns = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
+            //因为该广播状态的的key类型为null，所以直接get(null)即可将状态值取出
             Pattern pattern = patterns.get(null);
             //用户上一次的行为，并不在广播状态中，而是在我们在本类中定义的ValueState中。
             String prevAction = prevActionState.value();
+
             if (pattern != null && prevAction != null) {
                 // 如果前后两次行为都符合模式定义，输出一组匹配
                 if (pattern.action1.equals(prevAction) && pattern.action2.equals(action.action)) {
+
+                    //ctx.getCurrentKey()获取主流的key，为之前在keyBy
                     out.collect(new Tuple2<>(ctx.getCurrentKey(), pattern));
                 }
             }
