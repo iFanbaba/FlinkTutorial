@@ -81,8 +81,7 @@ public class BroadcastStateExample {
                 Collector<Tuple2<String, Pattern>> out) throws Exception {
 
             //从上下文中获取广播状态，并用当前数据更新广播状态
-            BroadcastState<Void, Pattern> bcState = ctx.getBroadcastState(
-                    new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
+            BroadcastState<Void, Pattern> bcState = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
 
             // 将广播状态更新为当前的pattern
             bcState.put(null, pattern);
