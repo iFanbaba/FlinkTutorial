@@ -40,7 +40,9 @@ public class BroadcastStateExample {
                 );
 
         // 定义广播状态的描述器，创建广播流
-        MapStateDescriptor<Void, Pattern> bcStateDescriptor = new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class));
+        // 广播变量的key，如果只是void，那么后续在processBroadcastElement和processElment和方法中，更新或者读取的时候，都需要指定某个key才能取出对应状态值。
+        MapStateDescriptor<String, Pattern> bcStateDescriptor = new MapStateDescriptor<>("patterns", Types.STRING, Types.POJO(Pattern.class));
+//        MapStateDescriptor<Void, Pattern> bcStateDescriptor = new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class));
         BroadcastStream<Pattern> bcPatterns = patternStream.broadcast(bcStateDescriptor);
 
         // 将事件流和广播流连接起来，进行处理
@@ -77,18 +79,18 @@ public class BroadcastStateExample {
                 Collector<Tuple2<String, Pattern>> out) throws Exception {
 
             //从上下文中获取广播状态，并用当前数据更新广播状态
-            BroadcastState<Void, Pattern> bcState = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
+            BroadcastState<String, Pattern> bcState = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.STRING, Types.POJO(Pattern.class)));
 
             // 将广播状态更新为当前的pattern
-            bcState.put(null, pattern);
+            bcState.put("xxxx", pattern);
         }
 
         @Override
         public void processElement(Action action, ReadOnlyContext ctx, Collector<Tuple2<String, Pattern>> out) throws Exception {
             //在 processElement 方法中只能读取状态，不能修改
-            ReadOnlyBroadcastState<Void, Pattern> patterns = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
+            ReadOnlyBroadcastState<String, Pattern> patterns = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.STRING, Types.POJO(Pattern.class)));
             //因为该广播状态的的key类型为null，所以直接get(null)即可将状态值取出
-            Pattern pattern = patterns.get(null);
+            Pattern pattern = patterns.get("xxxx");
             //用户上一次的行为，并不在广播状态中，而是在我们在本类中定义的ValueState中。
             String prevAction = prevActionState.value();
 
