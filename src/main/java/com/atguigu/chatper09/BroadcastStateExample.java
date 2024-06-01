@@ -8,10 +8,7 @@ package com.atguigu.chatper09;
  * Created by  wushengran
  */
 
-import org.apache.flink.api.common.state.BroadcastState;
-import org.apache.flink.api.common.state.MapStateDescriptor;
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
@@ -90,9 +87,8 @@ public class BroadcastStateExample {
         @Override
         public void processElement(Action action, ReadOnlyContext ctx, Collector<Tuple2<String, Pattern>> out) throws Exception {
             //在 processElement 方法中只能读取状态，不能修改
-            Pattern pattern = ctx.getBroadcastState(
-                    new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class))).get(null);
-
+            ReadOnlyBroadcastState<Void, Pattern> patterns = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class)));
+            Pattern pattern = patterns.get(null);
             //用户上一次的行为，并不在广播状态中，而是在我们在本类中定义的ValueState中。
             String prevAction = prevActionState.value();
             if (pattern != null && prevAction != null) {
