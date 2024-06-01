@@ -32,10 +32,10 @@ public class BroadcastStateExample {
                 new Action("Alice", "login"),
                 new Action("Alice", "pay"),
                 new Action("Bob", "login"),
-                new Action("Bob", "buy")
+                new Action("Bob", "order")
         );
 
-        // 定义行为模式流，代表了要检测的标准
+        // 定义行为模式流，代表了要检测的标准，给予他构建广播流
         DataStreamSource<Pattern> patternStream = env
                 .fromElements(
                         new Pattern("login", "pay"),
@@ -58,6 +58,11 @@ public class BroadcastStateExample {
         env.execute();
     }
 
+    //KeyedBroadcastProcessFunction<KS, IN1, IN2, OUT>
+    //KS: 主流的key类型
+    //IN1: 主流类型
+    //IN2: 广播流类型
+    //OUT: 输出流的类型
     public static class PatternEvaluator
             extends KeyedBroadcastProcessFunction<String, Action, Pattern, Tuple2<String, Pattern>> {
 
