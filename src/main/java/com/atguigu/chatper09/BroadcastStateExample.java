@@ -73,10 +73,7 @@ public class BroadcastStateExample {
         }
 
         @Override
-        public void processBroadcastElement(
-                Pattern pattern,
-                Context ctx,
-                Collector<Tuple2<String, Pattern>> out) throws Exception {
+        public void processBroadcastElement(Pattern pattern, Context ctx, Collector<Tuple2<String, Pattern>> out) throws Exception {
 
             //从上下文中获取广播状态，并用当前数据更新广播状态
             BroadcastState<String, Pattern> bcState = ctx.getBroadcastState(new MapStateDescriptor<>("patterns", Types.STRING, Types.POJO(Pattern.class)));
