@@ -40,8 +40,7 @@ public class BroadcastStateExample {
                 );
 
         // 定义广播状态的描述器，创建广播流
-        MapStateDescriptor<Void, Pattern> bcStateDescriptor = new MapStateDescriptor<>(
-                "patterns", Types.VOID, Types.POJO(Pattern.class));
+        MapStateDescriptor<Void, Pattern> bcStateDescriptor = new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class));
         BroadcastStream<Pattern> bcPatterns = patternStream.broadcast(bcStateDescriptor);
 
         // 将事件流和广播流连接起来，进行处理
