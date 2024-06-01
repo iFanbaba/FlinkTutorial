@@ -88,8 +88,7 @@ public class BroadcastStateExample {
         }
 
         @Override
-        public void processElement(Action action, ReadOnlyContext ctx,
-                                   Collector<Tuple2<String, Pattern>> out) throws Exception {
+        public void processElement(Action action, ReadOnlyContext ctx, Collector<Tuple2<String, Pattern>> out) throws Exception {
             //在 processElement 方法中只能读取状态，不能修改
             Pattern pattern = ctx.getBroadcastState(
                     new MapStateDescriptor<>("patterns", Types.VOID, Types.POJO(Pattern.class))).get(null);
