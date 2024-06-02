@@ -47,6 +47,8 @@ public class FakeWindowExample {
                         })
                 );
 
+        stream.print("原始数据流");
+
         // 统计每10s窗口内，每个url的pv
         stream.keyBy(data -> data.url)
                 .process(new FakeWindowResult(10000L))
