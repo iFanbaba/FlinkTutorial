@@ -22,6 +22,9 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 
 import org.apache.flink.util.Collector;
 
+import java.sql.Timestamp;
+import java.util.Calendar;
+
 
 /**
  * 9.2.3
@@ -32,9 +35,9 @@ import org.apache.flink.util.Collector;
  * 戳的状态变量，这样当新的数据到来时，发现并没有定时器存在，就可以注册新的定时器了，
  * 注册完定时器之后将定时器的时间戳继续保存在状态变量中。
  */
-public class PeriodicPvExample{
+public class PeriodicPvExample {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
@@ -59,7 +62,7 @@ public class PeriodicPvExample{
     }
 
     // 注册定时器，周期性输出pv
-    public static class PeriodicPvResult extends KeyedProcessFunction<String ,Event, String>{
+    public static class PeriodicPvResult extends KeyedProcessFunction<String, Event, String> {
         // 定义两个状态，保存当前pv值，以及定时器时间戳
         ValueState<Long> countState;
         ValueState<Long> timerTsState;
@@ -74,24 +77,36 @@ public class PeriodicPvExample{
         public void processElement(Event value, Context ctx, Collector<String> out) throws Exception {
             // 更新count值
             Long count = countState.value();
-            if (count == null){
+            if (count == null) {
                 countState.update(1L);
             } else {
                 countState.update(count + 1);
             }
             // 注册定时器，注册到10秒之后执行 onTimer 方法
-            if (timerTsState.value() == null){
+            if (timerTsState.value() == null) {
+                System.out.println("判断定时器...");
                 ctx.timerService().registerEventTimeTimer(value.timestamp + 10 * 1000L);
                 timerTsState.update(value.timestamp + 10 * 1000L);
             }
         }
 
+        //timestamp: 注册的时间
         @Override
         public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
-            out.collect(ctx.getCurrentKey() + " pv: " + countState.value());
+            long now = Calendar.getInstance().getTimeInMillis();
+            out.collect(ctx.getCurrentKey() + " pv: " + countState.value()
+                    + " timestamp: " + new Timestamp(timestamp)
+                    + " now: " + new Timestamp(now)
+                    + " diff: " + (now - timestamp)
+            );
             // 清空状态
-            timerTsState.clear();
+//            timerTsState.clear();
+
+            // 状态清空后，立即注册一个新的定时器，那么在processElement中就只需要判断一次timerTsState是否为null
+            ctx.timerService().registerEventTimeTimer(timestamp + 10 * 1000L);
+//            timerTsState.update(timestamp + 10 * 1000L);
         }
-    }}
+    }
+}
 
 
