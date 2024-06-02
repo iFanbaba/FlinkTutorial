@@ -55,7 +55,7 @@ public class AverageTimestampExample {
         // 统计每个用户的点击频次，到达5次就输出统计结果
         stream.keyBy(data -> data.user)
                 .flatMap(new AvgTsResult())
-                .print();
+                .print("聚合统计流");
 
         env.execute();
     }
@@ -115,7 +115,7 @@ public class AverageTimestampExample {
 
             // 达到5次就输出结果，并清空状态
             if (count == 5) {
-                out.collect(value.user + " 平均时间戳: " + new Timestamp(avgTsAggState.get()));
+                out.collect(value.user + " 平均时间戳: " + avgTsAggState.get());
                 countState.clear();
             }
         }
