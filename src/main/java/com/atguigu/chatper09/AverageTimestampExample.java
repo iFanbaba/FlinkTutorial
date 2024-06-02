@@ -50,6 +50,7 @@ public class AverageTimestampExample {
                         })
                 );
 
+        stream.print("原始数据流");
 
         // 统计每个用户的点击频次，到达5次就输出统计结果
         stream.keyBy(data -> data.user)
