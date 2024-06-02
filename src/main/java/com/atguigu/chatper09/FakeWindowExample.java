@@ -14,6 +14,8 @@ import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -47,7 +49,8 @@ public class FakeWindowExample {
                         })
                 );
 
-        stream.print("原始数据流");
+        stream.map(x -> Tuple3.of(x.user, x.url, x.timestamp / 10000 * 10000)).returns(new TypeHint<Tuple3<String, String, Long>>() {
+        }).print("原始数据流");
 
         // 统计每10s窗口内，每个url的pv
         stream.keyBy(data -> data.url)
