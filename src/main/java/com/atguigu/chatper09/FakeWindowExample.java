@@ -35,7 +35,7 @@ import java.sql.Timestamp;
  * 全窗口聚合结合的方式实现过这个需求。这里我们用 MapState 再来实现一下。
  */
 public class FakeWindowExample {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         SingleOutputStreamOperator<Event> stream = env.addSource(new ClickSource())
@@ -56,7 +56,7 @@ public class FakeWindowExample {
         env.execute();
     }
 
-    public static class FakeWindowResult extends KeyedProcessFunction<String, Event, String>{
+    public static class FakeWindowResult extends KeyedProcessFunction<String, Event, String> {
         // 定义属性，窗口长度
         private Long windowSize;
 
@@ -82,7 +82,8 @@ public class FakeWindowExample {
             ctx.timerService().registerEventTimeTimer(windowEnd - 1);
 
             // 更新状态中的pv值
-            if (windowPvMapState.contains(windowStart)){
+            // 用windowStart作为状态的key
+            if (windowPvMapState.contains(windowStart)) {
                 Long pv = windowPvMapState.get(windowStart);
                 windowPvMapState.put(windowStart, pv + 1);
             } else {
@@ -96,12 +97,13 @@ public class FakeWindowExample {
             Long windowEnd = timestamp + 1;
             Long windowStart = windowEnd - windowSize;
             Long pv = windowPvMapState.get(windowStart);
-            out.collect( "url: " + ctx.getCurrentKey()
+            out.collect("url: " + ctx.getCurrentKey()
                     + " 访问量: " + pv
                     + " 窗口：" + new Timestamp(windowStart) + " ~ " + new Timestamp(windowEnd));
 
             // 模拟窗口的销毁，清除map中的key
             windowPvMapState.remove(windowStart);
         }
-    }    }
+    }
+}
 
