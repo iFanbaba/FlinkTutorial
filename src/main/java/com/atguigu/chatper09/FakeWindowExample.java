@@ -82,7 +82,7 @@ public class FakeWindowExample {
             ctx.timerService().registerEventTimeTimer(windowEnd - 1);
 
             // 更新状态中的pv值
-            // 用windowStart作为状态的key
+            // 用windowStart作为状态的key，该状态存储url的访问次数
             if (windowPvMapState.contains(windowStart)) {
                 Long pv = windowPvMapState.get(windowStart);
                 windowPvMapState.put(windowStart, pv + 1);
