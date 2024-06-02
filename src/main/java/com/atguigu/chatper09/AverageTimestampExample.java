@@ -103,7 +103,7 @@ public class AverageTimestampExample {
 
             // 达到5次就输出结果，并清空状态
             if (count == 5) {
-                out.collect(value.user + " 平均时间戳：" + new Timestamp(avgTsAggState.get()));
+                out.collect(value.user + " 平均时间戳: " + new Timestamp(avgTsAggState.get()));
                 countState.clear();
             }
         }
