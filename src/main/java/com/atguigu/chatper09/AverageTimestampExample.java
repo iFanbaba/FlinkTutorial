@@ -83,6 +83,7 @@ public class AverageTimestampExample {
                             return Tuple2.of(accumulator.f0 + value.timestamp, accumulator.f1 + 1);
                         }
 
+                        // 输出聚合结果时，如何打印
                         @Override
                         public Long getResult(Tuple2<Long, Long> accumulator) {
                             return accumulator.f0 / accumulator.f1;
