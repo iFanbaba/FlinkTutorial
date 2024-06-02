@@ -55,7 +55,7 @@ public class AverageTimestampExample {
         // 统计每个用户的点击频次，到达5次就输出统计结果
         stream.keyBy(data -> data.user)
                 .flatMap(new AvgTsResult())
-                .print("聚合统计流");
+                .print("聚合流");
 
         env.execute();
     }
