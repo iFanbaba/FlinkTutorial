@@ -45,7 +45,10 @@ public class TwoStreamFullJoinExample {
         SingleOutputStreamOperator<Tuple3<String, String, Long>> stream2 = env
                 .fromElements(
                         Tuple3.of("a", "stream-2", 3000L),
-                        Tuple3.of("b", "stream-2", 4000L)
+                        Tuple3.of("b", "stream-2", 4000L),
+                        Tuple3.of("b", "stream-2", 5000L),
+                        Tuple3.of("b", "stream-2", 6000L)
+
                 )
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.<Tuple3<String, String, Long>>forMonotonousTimestamps()
@@ -65,7 +68,7 @@ public class TwoStreamFullJoinExample {
 
                     @Override
                     public void open(Configuration parameters) throws Exception {
-                        super.open(parameters);
+//                        super.open(parameters);
                         stream1ListState = getRuntimeContext().getListState(
                                 new ListStateDescriptor<Tuple3<String, String, Long>>("stream1-list", Types.TUPLE(Types.STRING, Types.STRING))
                         );
