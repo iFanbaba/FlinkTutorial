@@ -25,14 +25,19 @@ import org.apache.flink.util.Collector;
 import java.sql.Timestamp;
 
 
-// 使用KeyedProcessFunction模拟滚动窗口
+/**
+ * 9.2.3
+ * 3. 映射状态（MapState）
+ * 使用KeyedProcessFunction模拟滚动窗口
+ * 映射状态的用法和 Java 中的 HashMap 很相似。在这里我们可以通过 MapState 的使用来探
+ * 索一下窗口的底层实现，也就是我们要用映射状态来完整模拟窗口的功能。这里我们模拟一个
+ * 滚动窗口。我们要计算的是每一个 url 在每一个窗口中的 pv 数据。我们之前使用增量聚合和
+ * 全窗口聚合结合的方式实现过这个需求。这里我们用 MapState 再来实现一下。
+ */
 public class FakeWindowExample {
-
-
     public static void main(String[] args) throws Exception{
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         SingleOutputStreamOperator<Event> stream = env.addSource(new ClickSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy.<Event>forMonotonousTimestamps()
                         .withTimestampAssigner(new SerializableTimestampAssigner<Event>() {
