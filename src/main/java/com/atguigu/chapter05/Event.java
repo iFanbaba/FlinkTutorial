@@ -29,7 +29,7 @@ public class Event {
         return "Event{" +
                 "user='" + user + '\'' +
                 ", url='" + url + '\'' +
-                ", timestamp=" + new Timestamp(timestamp) +
+                ", timestamp=" + timestamp +
                 '}';
     }
 }

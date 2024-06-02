@@ -14,7 +14,6 @@ import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
-
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -99,7 +98,7 @@ public class FakeWindowExample {
             Long pv = windowPvMapState.get(windowStart);
             out.collect("url: " + ctx.getCurrentKey()
                     + "\t访问量: " + pv
-                    + "\t窗口: 【" + new Timestamp(windowStart) + " ~ " + new Timestamp(windowEnd)+"】");
+                    + "\t窗口: 【" + windowStart + "=>" + (windowEnd - 1) + "】");
 
             // 模拟窗口的销毁，清除map中的key
             windowPvMapState.remove(windowStart);
