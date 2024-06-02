@@ -17,10 +17,7 @@ import org.apache.flink.util.Collector;
 
 /**
  * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
+ * 9.2.2 支持的结构类型
  */
 
 public class StateTest {
