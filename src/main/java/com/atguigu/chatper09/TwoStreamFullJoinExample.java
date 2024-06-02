@@ -30,7 +30,8 @@ public class TwoStreamFullJoinExample {
         SingleOutputStreamOperator<Tuple3<String, String, Long>> stream1 = env
                 .fromElements(
                         Tuple3.of("a", "stream-1", 1000L),
-                        Tuple3.of("b", "stream-1", 2000L)
+                        Tuple3.of("b", "stream-1", 2000L),
+                        Tuple3.of("b", "stream-1", 4000L)
                 )
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.<Tuple3<String, String, Long>>forMonotonousTimestamps()
@@ -45,7 +46,7 @@ public class TwoStreamFullJoinExample {
         SingleOutputStreamOperator<Tuple3<String, String, Long>> stream2 = env
                 .fromElements(
                         Tuple3.of("a", "stream-2", 3000L),
-                        Tuple3.of("b", "stream-2", 4000L),
+                        Tuple3.of("b", "1", 4000L),
                         Tuple3.of("b", "stream-2", 5000L),
                         Tuple3.of("b", "stream-2", 6000L)
 
