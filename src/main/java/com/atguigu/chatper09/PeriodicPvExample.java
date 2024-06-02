@@ -79,7 +79,7 @@ public class PeriodicPvExample{
             } else {
                 countState.update(count + 1);
             }
-            // 注册定时器
+            // 注册定时器，注册到10秒之后执行 onTimer 方法
             if (timerTsState.value() == null){
                 ctx.timerService().registerEventTimeTimer(value.timestamp + 10 * 1000L);
                 timerTsState.update(value.timestamp + 10 * 1000L);
