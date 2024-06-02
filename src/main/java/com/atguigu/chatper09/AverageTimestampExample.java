@@ -76,6 +76,8 @@ public class AverageTimestampExample {
                             return Tuple2.of(0L, 0L);
                         }
 
+                        // 定义了中间状态如何计算
+                        // 即中间状态为一个tuple，第一个元素为时间戳之和，第二个元素为点击次数之和
                         @Override
                         public Tuple2<Long, Long> add(Event value, Tuple2<Long, Long> accumulator) {
                             return Tuple2.of(accumulator.f0 + value.timestamp, accumulator.f1 + 1);
