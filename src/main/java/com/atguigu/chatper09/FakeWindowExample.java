@@ -78,7 +78,7 @@ public class FakeWindowExample {
             Long windowStart = value.timestamp / windowSize * windowSize;
             Long windowEnd = windowStart + windowSize;
 
-            // 注册 end -1 的定时器，窗口触发计算
+            // 注册 end -1 的定时器，窗口触发计算【以当前窗口所能包含的最大时间戳，以他作为当前窗口定时器的时间】
             ctx.timerService().registerEventTimeTimer(windowEnd - 1);
 
             // 更新状态中的pv值
@@ -98,8 +98,8 @@ public class FakeWindowExample {
             Long windowStart = windowEnd - windowSize;
             Long pv = windowPvMapState.get(windowStart);
             out.collect("url: " + ctx.getCurrentKey()
-                    + " 访问量: " + pv
-                    + " 窗口：" + new Timestamp(windowStart) + " ~ " + new Timestamp(windowEnd));
+                    + "\t访问量: " + pv
+                    + "\t窗口: 【" + new Timestamp(windowStart) + " ~ " + new Timestamp(windowEnd)+"】");
 
             // 模拟窗口的销毁，清除map中的key
             windowPvMapState.remove(windowStart);
