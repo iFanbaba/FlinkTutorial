@@ -1,11 +1,11 @@
 package com.atguigu.chatper09;
 
 /**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
+ * 9.2.3
+ * 4. 聚合状态（AggregatingState）
+ * 我们举一个简单的例子，对用户点击事件流每 5 个数据统计一次平均时间戳。这是一个类
+ * 似计数窗口（CountWindow）求平均值的计算，这里我们可以使用一个有聚合状态的
+ * RichFlatMapFunction 来实现。
  */
 
 import com.atguigu.chapter05.ClickSource;
