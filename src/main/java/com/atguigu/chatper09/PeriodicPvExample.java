@@ -23,7 +23,15 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 
 
-
+/**
+ * 9.2.3
+ * 我们这里会使用用户 id 来进行分流，然后分别统计每个用户的 pv 数据，由于我们并不想
+ * 每次 pv 加一，就将统计结果发送到下游去，所以这里我们注册了一个定时器，用来隔一段时
+ * 间发送 pv 的统计结果，这样对下游算子的压力不至于太大。具体实现方式是定义一个用来保
+ * 存定时器时间戳的值状态变量。当定时器触发并向下游发送数据以后，便清空储存定时器时间
+ * 戳的状态变量，这样当新的数据到来时，发现并没有定时器存在，就可以注册新的定时器了，
+ * 注册完定时器之后将定时器的时间戳继续保存在状态变量中。
+ */
 public class PeriodicPvExample{
 
     public static void main(String[] args) throws Exception{
