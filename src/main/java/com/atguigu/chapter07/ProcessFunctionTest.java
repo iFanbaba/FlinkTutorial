@@ -44,7 +44,7 @@ public class ProcessFunctionTest {
 //                        }
 //                        System.out.println(ctx.timestamp());
                         //ctx.timestamp()是当前数据的时间戳，
-                        //ctx.timerService().currentWatermark()是当前的水印，他是 上一个timestamp - 乱序时间 - 1 得到的
+                        //ctx.timerService().currentWatermark()是当前的水印，他是 上一个 timestamp - 乱序时间 - 1 得到的
                         System.out.println(value);
                         System.out.println(ctx.timestamp() + " -> " + ctx.timerService().currentWatermark() + " -> " + (ctx.timestamp()-ctx.timerService().currentWatermark()));
                     }
