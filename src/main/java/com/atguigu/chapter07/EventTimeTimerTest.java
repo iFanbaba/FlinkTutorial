@@ -8,6 +8,7 @@ package com.atguigu.chapter07;
  * Created by  wushengran
  */
 
+import com.atguigu.chapter05.ClickSource;
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -22,7 +23,7 @@ public class EventTimeTimerTest {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        SingleOutputStreamOperator<Event> stream = env.addSource(new CustomSource())
+        SingleOutputStreamOperator<Event> stream = env.addSource(new ClickSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy.<Event>forMonotonousTimestamps()
                         .withTimestampAssigner(new SerializableTimestampAssigner<Event>() {
                             @Override
@@ -36,10 +37,15 @@ public class EventTimeTimerTest {
                 .process(new KeyedProcessFunction<Boolean, Event, String>() {
                     @Override
                     public void processElement(Event value, Context ctx, Collector<String> out) throws Exception {
+                        //ctx.getCurrentKey()是分区键
+//                        out.collect(ctx.getCurrentKey() +"");
+                        out.collect(value.toString());
                         out.collect("数据到达，时间戳为：" + ctx.timestamp());
-                        out.collect("数据到达，水位线为：" + ctx.timerService().currentWatermark() + "\n -------分割线-------");
+                        out.collect("数据到达，水位线为：" + ctx.timerService().currentWatermark() );
+                        out.collect("差值："+ (ctx.timestamp() - ctx.timerService().currentWatermark()));
+                        out.collect("-------分割线-------");
                         // 注册一个10秒后的定时器
-                        ctx.timerService().registerEventTimeTimer(ctx.timestamp() + 10 * 1000L);
+                        ctx.timerService().registerEventTimeTimer(ctx.timestamp() + 5 * 1000L);
                     }
 
                     @Override
