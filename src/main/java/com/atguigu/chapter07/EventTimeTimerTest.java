@@ -23,7 +23,7 @@ public class EventTimeTimerTest {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        SingleOutputStreamOperator<Event> stream = env.addSource(new ClickSource())
+        SingleOutputStreamOperator<Event> stream = env.addSource(new CustomSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy.<Event>forMonotonousTimestamps()
                         .withTimestampAssigner(new SerializableTimestampAssigner<Event>() {
                             @Override
@@ -51,7 +51,7 @@ public class EventTimeTimerTest {
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
                         // 当某一次的水位线时间大于定时器的时间，才会触发定时器
-                        out.collect("定时器触发，触发时间：" + timestamp);
+                        out.collect("定时器触发，触发时间：" + timestamp + " 定时器触发时的水位线："+ctx.timerService().currentWatermark());
                     }
                 })
                 .print();
