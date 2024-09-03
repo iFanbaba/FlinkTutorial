@@ -24,6 +24,8 @@ import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
+import java.text.SimpleDateFormat;
+
 public class TriggerExample {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -41,7 +43,7 @@ public class TriggerExample {
                                 })
                 )
                 .keyBy(r -> r.url)
-                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(1)))
                 .trigger(new MyTrigger())
                 .process(new WindowResult())
                 .print();
@@ -71,7 +73,7 @@ public class TriggerExample {
                     new ValueStateDescriptor<Boolean>("first-event", Types.BOOLEAN)
             );
             if (isFirstEvent.value() == null) {
-                for (long i = timeWindow.getStart(); i < timeWindow.getEnd(); i = i + 1000L) {
+                for (long i = timeWindow.getStart(); i < timeWindow.getEnd(); i = i + 10000L) {
                     triggerContext.registerEventTimeTimer(i);
                 }
                 isFirstEvent.update(true);
@@ -81,6 +83,9 @@ public class TriggerExample {
 
         @Override
         public TriggerResult onEventTime(long l, TimeWindow timeWindow, TriggerContext triggerContext) throws Exception {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String format = sdf.format(l);
+            System.out.println("触发器执行: "+format);
             return TriggerResult.FIRE;
         }
 
