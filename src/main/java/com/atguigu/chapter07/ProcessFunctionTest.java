@@ -48,6 +48,9 @@ public class ProcessFunctionTest {
                         //源码: output.emitWatermark(new Watermark(this.maxTimestamp - this.outOfOrdernessMillis - 1L))
                         System.out.println(value);
                         System.out.println(ctx.timestamp() + " -> " + ctx.timerService().currentWatermark() + " -> " + (ctx.timestamp()-ctx.timerService().currentWatermark()));
+
+                        //会直接报错，因为只能在keystream中设置定时器
+//                        ctx.timerService().registerEventTimeTimer(1725373270240L);
                     }
                 })
                 .print();
