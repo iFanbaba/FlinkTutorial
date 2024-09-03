@@ -30,15 +30,20 @@ public class ProcessingTimeTimerTest {
                 .process(new KeyedProcessFunction<Boolean, Event, String>() {
                     @Override
                     public void processElement(Event value, Context ctx, Collector<String> out) throws Exception {
+                        // 当前处理时间就等于当前时间戳
                         Long currTs = ctx.timerService().currentProcessingTime();
+                        System.out.println("当前时间1 " + currTs);
+                        System.out.println("当前时间2 " + System.currentTimeMillis());
+                        System.out.println();
+
                         out.collect("数据到达，到达时间：" + new Timestamp(currTs));
                         // 注册一个10秒后的定时器
-                        ctx.timerService().registerProcessingTimeTimer(currTs + 10 * 1000L);
+                        ctx.timerService().registerProcessingTimeTimer(currTs + 5 * 1000L);
                     }
 
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
-                        out.collect("定时器触发，触发时间：" + new Timestamp(timestamp));
+                        out.collect("定时器触发，触发时间：" + timestamp);
                     }
                 })
                 .print();
