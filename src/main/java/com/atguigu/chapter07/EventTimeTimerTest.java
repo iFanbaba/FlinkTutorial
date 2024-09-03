@@ -50,6 +50,7 @@ public class EventTimeTimerTest {
 
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
+                        // 当某一次的水位线时间大于定时器的时间，才会触发定时器
                         out.collect("定时器触发，触发时间：" + timestamp);
                     }
                 })
