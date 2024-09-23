@@ -24,7 +24,7 @@ import org.apache.flink.util.Collector;
 // 实时对账
 public class BillCheckExample {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
@@ -64,7 +64,7 @@ public class BillCheckExample {
     }
 
     // 自定义实现CoProcessFunction
-    public static class OrderMatchResult extends CoProcessFunction<Tuple3<String, String, Long>, Tuple4<String, String, String, Long>, String>{
+    public static class OrderMatchResult extends CoProcessFunction<Tuple3<String, String, Long>, Tuple4<String, String, String, Long>, String> {
         // 定义状态变量，用来保存已经到达的事件
         private ValueState<Tuple3<String, String, Long>> appEventState;
         private ValueState<Tuple4<String, String, String, Long>> thirdPartyEventState;
@@ -76,14 +76,14 @@ public class BillCheckExample {
             );
 
             thirdPartyEventState = getRuntimeContext().getState(
-                    new ValueStateDescriptor<Tuple4<String, String, String, Long>>("thirdparty-event", Types.TUPLE(Types.STRING, Types.STRING, Types.STRING,Types.LONG))
+                    new ValueStateDescriptor<Tuple4<String, String, String, Long>>("thirdparty-event", Types.TUPLE(Types.STRING, Types.STRING, Types.STRING, Types.LONG))
             );
         }
 
         @Override
         public void processElement1(Tuple3<String, String, Long> value, Context ctx, Collector<String> out) throws Exception {
             // 看另一条流中事件是否来过
-            if (thirdPartyEventState.value() != null){
+            if (thirdPartyEventState.value() != null) {
                 out.collect("对账成功：" + value + "  " + thirdPartyEventState.value());
                 // 清空状态
                 thirdPartyEventState.clear();
@@ -97,7 +97,7 @@ public class BillCheckExample {
 
         @Override
         public void processElement2(Tuple4<String, String, String, Long> value, Context ctx, Collector<String> out) throws Exception {
-            if (appEventState.value() != null){
+            if (appEventState.value() != null) {
                 out.collect("对账成功：" + appEventState.value() + "  " + value);
                 // 清空状态
                 appEventState.clear();
@@ -121,5 +121,6 @@ public class BillCheckExample {
             appEventState.clear();
             thirdPartyEventState.clear();
         }
-    }}
+    }
+}
 
