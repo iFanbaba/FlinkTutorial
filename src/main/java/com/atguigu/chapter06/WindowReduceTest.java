@@ -8,13 +8,19 @@ package com.atguigu.chapter06;
  * Created by  wushengran
  */
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atguigu.chapter05.ClickSource;
 import com.atguigu.chapter05.Event;
+import com.atguigu.utils.FlinkSourceUtil;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
@@ -25,19 +31,37 @@ import java.time.Duration;
 
 public class WindowReduceTest {
     public static void main(String[] args) throws Exception {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
 
+        ParameterTool parameterTool = ParameterTool.fromArgs(args);
+        String sourceKafka = parameterTool.get("sourceKafka");
+        String sourceTopic = parameterTool.get("sourceTopic");
+        String sourceGroup = parameterTool.get("sourceGroup");
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 从自定义数据源读取数据，并提取时间戳、生成水位线
-        SingleOutputStreamOperator<Event> stream = env.addSource(new ClickSource())
-                .assignTimestampsAndWatermarks(WatermarkStrategy.<Event>forBoundedOutOfOrderness(Duration.ZERO)
+        KafkaSource<String> source = FlinkSourceUtil.getKafkaSource(sourceGroup, sourceTopic, sourceKafka);
+
+        DataStreamSource<String> kafka_source = env.fromSource(source, WatermarkStrategy.noWatermarks(), "kafka_source");
+        SingleOutputStreamOperator<Event> map = kafka_source.map(new MapFunction<String, Event>() {
+            @Override
+            public Event map(String s) throws Exception {
+                JSONObject jsonObject = JSON.parseObject(s);
+                String user = jsonObject.getString("user");
+                String url = jsonObject.getString("url");
+                Long ts = jsonObject.getLong("ts");
+                return new Event(user, url, ts);
+            }
+        });
+
+        SingleOutputStreamOperator<Event> stream = map
+                .assignTimestampsAndWatermarks(WatermarkStrategy.<Event>forBoundedOutOfOrderness(Duration.ofSeconds(5L))
                         .withTimestampAssigner(new SerializableTimestampAssigner<Event>() {
                             @Override
                             public long extractTimestamp(Event element, long recordTimestamp) {
                                 return element.timestamp;
                             }
-                        }));          stream.map(new MapFunction<Event, Tuple2<String, Long>>() {
+                        }));
+        stream.map(new MapFunction<Event, Tuple2<String, Long>>() {
                     @Override
                     public Tuple2<String, Long> map(Event value) throws Exception {
                         // 将数据转换成二元组，方便计算
