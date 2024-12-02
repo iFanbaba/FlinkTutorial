@@ -27,8 +27,6 @@ public class WindowAggregateTest {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-
-
         SingleOutputStreamOperator<Event> stream = env.addSource(new ClickSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy.<Event>forMonotonousTimestamps()
                         .withTimestampAssigner(new SerializableTimestampAssigner<Event>() {
@@ -43,7 +41,6 @@ public class WindowAggregateTest {
                 .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(2)))
                 .aggregate(new AvgPv())
                 .print();
-
 
         env.execute();
     }
