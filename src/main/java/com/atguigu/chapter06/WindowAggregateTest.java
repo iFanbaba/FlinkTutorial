@@ -36,6 +36,8 @@ public class WindowAggregateTest {
                             }
                         }));
 
+        stream.print();
+
         // 所有数据设置相同的key，发送到同一个分区统计PV和UV，再相除
         stream.keyBy(data -> true)
                 .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(2)))

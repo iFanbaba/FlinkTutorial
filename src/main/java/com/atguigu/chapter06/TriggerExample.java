@@ -46,7 +46,7 @@ public class TriggerExample {
                 .window(TumblingEventTimeWindows.of(Time.minutes(1)))
                 .trigger(new MyTrigger())
                 .process(new WindowResult())
-                .print();
+                .print("结果");
 
         env.execute();
     }
@@ -85,7 +85,7 @@ public class TriggerExample {
         public TriggerResult onEventTime(long l, TimeWindow timeWindow, TriggerContext triggerContext) throws Exception {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String format = sdf.format(l);
-            System.out.println("触发器执行: "+format);
+            System.out.println("触发器执行: " + format);
             return TriggerResult.FIRE;
         }
 

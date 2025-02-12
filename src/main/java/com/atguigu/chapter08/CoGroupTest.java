@@ -30,7 +30,11 @@ public class CoGroupTest {
                         Tuple2.of("a", 1000L),
                         Tuple2.of("b", 1000L),
                         Tuple2.of("a", 2000L),
-                        Tuple2.of("b", 2000L)
+                        Tuple2.of("a", 4000L),
+                        Tuple2.of("a", 5000L),
+                        Tuple2.of("a", 6000L),
+                        Tuple2.of("a", 7000L)
+
                 )
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy
@@ -65,8 +69,8 @@ public class CoGroupTest {
                                 )
                 );
 
-        stream1
-                .coGroup(stream2)
+        stream1.keyBy(k->k.f0)
+                .coGroup(stream2.keyBy(k->k.f0))
                 .where(r -> r.f0)
                 .equalTo(r -> r.f0)
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
